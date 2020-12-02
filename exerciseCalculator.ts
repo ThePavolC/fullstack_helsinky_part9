@@ -1,18 +1,3 @@
-/*
-input
-[3, 0, 2, 4.5, 0, 3, 1]
-
-output
-{ periodLength: 7,
-  trainingDays: 5,
-  success: false,
-  rating: 2,
-  ratingDescription: 'not too bad but could be better',
-  target: 2,
-  average: 1.9285714285714286 }
-
-*/
-
 interface RatingValues {
   rating: number;
   ratingDescription: string;
@@ -71,4 +56,31 @@ const calculateExerciseDays = (
   };
 };
 
-console.log(calculateExerciseDays([3, 0, 2, 4.5, 0, 3, 1], 2));
+const parseArgumentsForCalculateExerciseDays = (
+  args: Array<string>,
+): { target: number; trainingDays: Array<number> } => {
+  if (args.length < 4)
+    throw new Error(
+      'Invalid arguments. Run as: calculateExercises <TARGET> <TRAINING DAYS>',
+    );
+
+  const [a, b, _target, ..._days] = args;
+
+  if (!isNaN(Number(_target)) && _days.every((day) => !isNaN(Number(day)))) {
+    return {
+      target: Number(args[2]),
+      trainingDays: _days.map((day) => Number(day)),
+    };
+  } else {
+    throw new Error('Provided values were not numbers!');
+  }
+};
+
+if (process.argv.length === 2) {
+  console.log(calculateExerciseDays([3, 0, 2, 4.5, 0, 3, 1], 2));
+} else {
+  const { target, trainingDays } = parseArgumentsForCalculateExerciseDays(
+    process.argv,
+  );
+  console.log(calculateExerciseDays(trainingDays, target));
+}

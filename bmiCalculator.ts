@@ -21,7 +21,7 @@ const calculateBmi = (height: number, weight: number): string => {
   }
 };
 
-const parseArguments = (
+const parseArgumentsForCalculateBmi = (
   args: Array<string>,
 ): { height: number; weight: number } => {
   if (args.length !== 4)
@@ -42,6 +42,6 @@ const parseArguments = (
 if (process.argv.length === 2) {
   console.log(calculateBmi(180, 74));
 } else {
-  const { height, weight } = parseArguments(process.argv);
+  const { height, weight } = parseArgumentsForCalculateBmi(process.argv);
   console.log(calculateBmi(height, weight));
 }
