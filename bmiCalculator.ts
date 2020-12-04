@@ -46,3 +46,4 @@ if (process.argv.length === 2) {
   const { height, weight } = parseArgumentsForCalculateBmi(process.argv);
   console.log(calculateBmi(height, weight));
 }
+export default calculateBmi;
