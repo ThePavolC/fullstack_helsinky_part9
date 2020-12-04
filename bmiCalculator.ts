@@ -19,6 +19,7 @@ const calculateBmi = (height: number, weight: number): string => {
   if (bmi_index >= BMI.HIGH) {
     return 'Obese';
   }
+  throw `Something went wrong with values ${height} and ${weight}`;
 };
 
 const parseArgumentsForCalculateBmi = (

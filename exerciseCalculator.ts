@@ -7,8 +7,8 @@ const getRating = (
   trainingDays: number,
   periodLength: number,
 ): RatingValues => {
-  let rating;
-  let ratingDescription;
+  let rating: RatingValues['rating'] = -1;
+  let ratingDescription: RatingValues['ratingDescription'] = 'Invalid';
   const exercise_rate = trainingDays / periodLength;
 
   if (exercise_rate <= 0.1) {
@@ -64,7 +64,7 @@ const parseArgumentsForCalculateExerciseDays = (
       'Invalid arguments. Run as: calculateExercises <TARGET> <TRAINING DAYS>',
     );
 
-  const [a, b, _target, ..._days] = args;
+  const [, , _target, ..._days] = args;
 
   if (!isNaN(Number(_target)) && _days.every((day) => !isNaN(Number(day)))) {
     return {
