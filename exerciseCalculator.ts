@@ -84,3 +84,5 @@ if (process.argv.length === 2) {
   );
   console.log(calculateExerciseDays(trainingDays, target));
 }
+
+export default calculateExerciseDays;
