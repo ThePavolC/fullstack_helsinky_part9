@@ -38,7 +38,7 @@ interface ExerciseDays {
 const calculateExerciseDays = (
   dailyHours: Array<number>,
   target: number,
-): object => {
+): ExerciseDays => {
   const average = dailyHours.reduce((a, b) => a + b, 0) / dailyHours.length;
   const periodLength = dailyHours.length;
   const trainingDays = dailyHours.filter((hours) => hours > 0).length;
