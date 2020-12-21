@@ -3,7 +3,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { Container, Icon, List } from "semantic-ui-react";
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { addPatientDetail, useStateValue } from "../state";
 import { Gender, Patient } from "../types";
 
 const PatientDetailPage: React.FC = () => {
@@ -22,7 +22,7 @@ const PatientDetailPage: React.FC = () => {
           `${apiBaseUrl}/patients/${id}`
         );
         setPatient(detail);
-        dispatch({ type: "ADD_PATIENT_DETAIL", payload: detail });
+        dispatch(addPatientDetail(detail));
       };
       getPatientDetail();
     }
