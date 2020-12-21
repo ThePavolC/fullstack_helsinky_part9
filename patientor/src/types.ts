@@ -10,9 +10,10 @@ export interface Patient {
   ssn: string;
   gender: Gender;
   occupation: string;
+  entries: Entry[];
 }
 
-export type PublicPatient = Omit<Patient, 'ssn'>;
+export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
 
 export type NewPatient = Omit<Patient, 'id'>;
 
@@ -21,3 +22,5 @@ export interface Diagnose {
   name: string;
   latin?: string;
 }
+
+export interface Entry {}
