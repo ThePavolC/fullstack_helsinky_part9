@@ -67,7 +67,6 @@ const toNewPatientEntry = (object: {
   ssn: any;
   gender: any;
   occupation: any;
-  entries: any;
 }): NewPatient => {
   return {
     name: parseName(object.name),
