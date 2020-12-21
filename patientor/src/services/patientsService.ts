@@ -30,7 +30,7 @@ const addPatient = (patientData: NewPatient): Patient => {
 };
 
 const getPatient = (patientId: string): Patient | undefined => {
-  return patientEntries.find((patient) => (patient.id = patientId));
+  return patientEntries.find((patient) => patient.id === patientId);
 };
 
 export default {
