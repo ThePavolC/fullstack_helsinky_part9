@@ -7,6 +7,8 @@ import { addPatientDetail, useStateValue } from "../state";
 import { Entry, Gender, Patient } from "../types";
 
 const EntryItem: React.FC<{ entry: Entry }> = ({ entry }) => {
+  const [{ diagnoses }] = useStateValue();
+
   return (
     <>
       <p>
@@ -15,7 +17,9 @@ const EntryItem: React.FC<{ entry: Entry }> = ({ entry }) => {
       {entry.diagnosisCodes && (
         <List.List>
           {entry.diagnosisCodes.map((code) => (
-            <List.Item key={code}>{code}</List.Item>
+            <List.Item key={code}>
+              {code} - {diagnoses[code]?.name}
+            </List.Item>
           ))}
         </List.List>
       )}
