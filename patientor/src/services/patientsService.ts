@@ -31,14 +31,11 @@ const getPatient = (patientId: string): Patient | undefined => {
   return patients.find((patient) => patient.id === patientId);
 };
 
-const addEntry = (
-  patientId: string,
-  entry: Entry,
-): Array<Entry> | undefined => {
+const addEntry = (patientId: string, entry: Entry): Patient | undefined => {
   const patient = getPatient(patientId);
   if (patient) {
     patient.entries.push(entry);
-    return patient.entries;
+    return patient;
   } else {
     return undefined;
   }

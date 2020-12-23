@@ -1,120 +1,18 @@
 import axios from "axios";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Container, Icon, IconProps, List, Segment } from "semantic-ui-react";
-import { apiBaseUrl } from "../constants";
-import { addPatientDetail, useStateValue } from "../state";
+import { Button, Container, Icon, List } from "semantic-ui-react";
+import AddEntryModal from "../AddEntryModal";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
 import {
-  Entry,
-  Gender,
-  Patient,
-  HospitalEntry,
-  HealthCheckEntry,
-  OccupationalHealthcareEntry,
-  HealthCheckRating,
-} from "../types";
+  HealthCheckEntryDetail,
+  HospitalEntryDetail,
+  OccupationalHealthcareEntryDetail,
+} from "../components/EntryDetail";
+import { apiBaseUrl } from "../constants";
+import { addEntry, addPatientDetail, useStateValue } from "../state";
+import { Entry, Gender, Patient } from "../types";
 import { assertNever } from "../utils";
-
-interface EntryDetailProps {
-  date: string;
-  description: string;
-  diagnosisCodes: Array<string> | undefined;
-  icon: IconProps["name"];
-  healthCheckRating?: HealthCheckRating;
-}
-
-const EntryDetail: React.FC<EntryDetailProps> = ({
-  date,
-  description,
-  diagnosisCodes,
-  icon,
-  healthCheckRating,
-}) => {
-  const [{ diagnoses }] = useStateValue();
-
-  let heartColor: IconProps["color"];
-  switch (healthCheckRating) {
-    case HealthCheckRating.Healthy:
-      heartColor = "green";
-      break;
-    case HealthCheckRating.LowRisk:
-      heartColor = "yellow";
-      break;
-    case HealthCheckRating.HighRisk:
-      heartColor = "red";
-      break;
-    case HealthCheckRating.CriticalRisk:
-      heartColor = "black";
-      break;
-  }
-
-  return (
-    <Segment>
-      <h4>
-        {date} <Icon name={icon} />
-      </h4>
-
-      <div>
-        <i style={{ color: "dimgrey" }}>{description}</i>
-      </div>
-      {diagnosisCodes && (
-        <div>
-          <List.List>
-            {diagnosisCodes.map((code) => (
-              <List.Item key={code}>
-                {code} - {diagnoses[code]?.name}
-              </List.Item>
-            ))}
-          </List.List>
-        </div>
-      )}
-
-      {healthCheckRating !== undefined && (
-        <div>
-          <Icon name="heart" color={heartColor} />
-        </div>
-      )}
-    </Segment>
-  );
-};
-
-const HospitalEntryDetail: React.FC<{ entry: HospitalEntry }> = ({ entry }) => {
-  return (
-    <EntryDetail
-      date={entry.date}
-      description={entry.description}
-      diagnosisCodes={entry?.diagnosisCodes}
-      icon="hospital"
-    />
-  );
-};
-
-const HealthCheckEntryDetail: React.FC<{ entry: HealthCheckEntry }> = ({
-  entry,
-}) => {
-  return (
-    <EntryDetail
-      date={entry.date}
-      description={entry.description}
-      diagnosisCodes={entry.diagnosisCodes}
-      icon="stethoscope"
-      healthCheckRating={entry.healthCheckRating}
-    />
-  );
-};
-
-const OccupationalHealthcareEntryDetail: React.FC<{
-  entry: OccupationalHealthcareEntry;
-}> = ({ entry }) => {
-  return (
-    <EntryDetail
-      date={entry.date}
-      description={entry.description}
-      diagnosisCodes={entry.diagnosisCodes}
-      icon="user md"
-    />
-  );
-};
 
 const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
   switch (entry.type) {
@@ -133,6 +31,32 @@ const PatientDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = React.useState<Patient>();
   const [{ patientDetails }, dispatch] = useStateValue();
+
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+  const openModal = (): void => setModalOpen(true);
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: updatedPatient } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${id}/entries`,
+        {
+          ...values,
+        }
+      );
+      setPatient(updatedPatient);
+      dispatch(addEntry(updatedPatient));
+
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
 
   React.useEffect(() => {
     const detail = patientDetails[id];
@@ -170,7 +94,19 @@ const PatientDetailPage: React.FC = () => {
           <List.Item>occupation: {patient?.occupation}</List.Item>
         </List>
 
-        <h3>entries</h3>
+        <h3>
+          entries
+          <span style={{ marginLeft: 8 }}>
+            <AddEntryModal
+              modalOpen={modalOpen}
+              onSubmit={submitNewEntry}
+              error={error}
+              onClose={closeModal}
+            />
+            <Button onClick={() => openModal()} icon="plus" color="green" />
+          </span>
+        </h3>
+
         <List>
           {patient?.entries.map((entry) => (
             <List.Item key={entry.id}>

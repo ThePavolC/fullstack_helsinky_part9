@@ -24,6 +24,7 @@ export const SET_PATIENT_LIST = "SET_PATIENT_LIST";
 export const ADD_PATIENT = "ADD_PATIENT";
 export const ADD_PATIENT_DETAIL = "ADD_PATIENT_DETAIL";
 export const SET_DIAGNOSES_LIST = "SET_DIAGNOSES_LIST";
+export const ADD_ENTRY = "ADD_ENTRY";
 
 interface SetPatientListAction {
   type: typeof SET_PATIENT_LIST;
@@ -44,6 +45,13 @@ export type PatientActionTypes =
   | SetPatientListAction
   | AddPatientAction
   | AddPatientDetailAction;
+
+interface AddEntryAction {
+  type: typeof ADD_ENTRY;
+  payload: Patient;
+}
+
+export type EntryActions = AddEntryAction;
 
 interface SetDiagnosesListAction {
   type: typeof SET_DIAGNOSES_LIST;

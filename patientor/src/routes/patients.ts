@@ -36,9 +36,9 @@ router.post('/:id/entries', (req, res) => {
       newEntry.sickLeave = req.body.sickLeave as SickLeave;
       break;
   }
-  const entries = patientService.addEntry(req.params.id, newEntry);
-  if (entries) {
-    res.json(entries);
+  const updatedPatient = patientService.addEntry(req.params.id, newEntry);
+  if (updatedPatient) {
+    res.json(updatedPatient);
   } else {
     res.status(404);
   }
