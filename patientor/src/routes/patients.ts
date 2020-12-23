@@ -1,6 +1,8 @@
 import express from 'express';
 import patientService from '../services/patientsService';
-import toNewPatientEntry from '../utils';
+import { Discharge, Entry, HealthCheckRating, SickLeave } from '../types';
+import { toNewEntry, toNewPatientEntry } from '../utils';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 
@@ -13,7 +15,32 @@ router.get('/:id', (req, res) => {
   if (patient) {
     res.json(patient);
   } else {
-    res.status(440);
+    res.status(404);
+  }
+});
+
+router.post('/:id/entries', (req, res) => {
+  const newEntry = toNewEntry(req.body) as Entry;
+  newEntry.id = uuidv4();
+
+  switch (newEntry.type) {
+    case 'Hospital':
+      newEntry.discharge = req.body.discharge as Discharge;
+      break;
+    case 'HealthCheck':
+      newEntry.healthCheckRating = req.body
+        .healthCheckRating as HealthCheckRating;
+      break;
+    case 'OccupationalHealthcare':
+      newEntry.employerName = req.body.employerName as string;
+      newEntry.sickLeave = req.body.sickLeave as SickLeave;
+      break;
+  }
+  const entries = patientService.addEntry(req.params.id, newEntry);
+  if (entries) {
+    res.json(entries);
+  } else {
+    res.status(404);
   }
 });
 

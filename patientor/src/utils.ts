@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Gender, NewPatient } from './types';
+import { Diagnosis, Gender, NewEntry, NewPatient } from './types';
 
 // Type Guards
 
@@ -31,7 +31,7 @@ const parseName = (name: any): string => {
   return name;
 };
 
-const parseDateOfBirth = (date: any): string => {
+const parseDate = (date: any): string => {
   if (!date || !isString(date) || !isDate(date)) {
     throw new Error(`Incorrect or missing date`);
   }
@@ -59,9 +59,42 @@ const parseOccupation = (occupation: any): string => {
   return occupation;
 };
 
+const parseEntryType = (
+  type: any,
+): 'Hospital' | 'HealthCheck' | 'OccupationalHealthcare' => {
+  if (
+    !type ||
+    ['Hospital', 'HealthCheck', 'OccupationalHealthcare'].indexOf(type) === -1
+  ) {
+    throw new Error(`Incorrect or missing description`);
+  }
+  return type;
+};
+
+const parseDescription = (description: any): string => {
+  if (!description || !isString(description)) {
+    throw new Error(`Incorrect or missing description`);
+  }
+  return description;
+};
+
+const parseSpecialist = (specialist: any): string => {
+  if (!specialist || !isString(specialist)) {
+    throw new Error(`Incorrect or missing specialist`);
+  }
+  return specialist;
+};
+
+const parseDiagnosisCodes = (codes: any): Array<Diagnosis['code']> => {
+  if (codes && codes.every((d: string) => !isString(d))) {
+    throw new Error(`Incorrect diagnosis codes`);
+  }
+  return codes;
+};
+
 // Utils
 
-const toNewPatientEntry = (object: {
+export const toNewPatientEntry = (object: {
   name: any;
   dateOfBirth: any;
   ssn: any;
@@ -70,7 +103,7 @@ const toNewPatientEntry = (object: {
 }): NewPatient => {
   return {
     name: parseName(object.name),
-    dateOfBirth: parseDateOfBirth(object.dateOfBirth),
+    dateOfBirth: parseDate(object.dateOfBirth),
     ssn: parseSsn(object.ssn),
     gender: parseGender(object.gender),
     occupation: parseOccupation(object.occupation),
@@ -78,4 +111,18 @@ const toNewPatientEntry = (object: {
   };
 };
 
-export default toNewPatientEntry;
+export const toNewEntry = (object: {
+  type: any;
+  description: any;
+  date: any;
+  specialist: any;
+  diagnosisCodes?: any;
+}): NewEntry => {
+  return {
+    type: parseEntryType(object.type),
+    description: parseDescription(object.description),
+    date: parseDate(object.date),
+    specialist: parseSpecialist(object.specialist),
+    diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
+  };
+};
