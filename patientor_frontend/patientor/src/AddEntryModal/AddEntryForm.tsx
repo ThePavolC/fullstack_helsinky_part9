@@ -1,6 +1,6 @@
-import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Button, Grid } from "semantic-ui-react";
+import { Field, Form, Formik } from "formik";
 import {
   DateField,
   DiagnosisSelection,
@@ -35,16 +35,16 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         const errors: { [field: string]: string } = {};
 
         if (!values.description) {
-          errors.name = requiredError;
+          errors.description = requiredError;
         }
         if (!values.date) {
-          errors.name = requiredError;
+          errors.date = requiredError;
         }
         if (!values.specialist) {
-          errors.name = requiredError;
+          errors.specialist = requiredError;
         }
         if (!values.type) {
-          errors.name = requiredError;
+          errors.type = requiredError;
         }
 
         return errors;
