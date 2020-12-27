@@ -5,31 +5,81 @@ import {
   DateField,
   DiagnosisSelection,
   EntryTypeSelection,
+  HealthCheckRatingSelection,
+  SickLeaveSelection,
   TextField,
 } from "../AddPatientModal/FormField";
 import { useStateValue } from "../state";
-import { Entry } from "../types";
+import { Discharge, Entry, HealthCheckRating, SickLeave } from "../types";
 
 export type EntryFormValues = Omit<Entry, "id">;
 
+export interface NewEntryFormValues extends EntryFormValues {
+  sickLeave?: SickLeave;
+  employerName?: string;
+  dischargeDate?: string;
+  dischargeCriteria?: string;
+  discharge?: Discharge;
+  healthCheckRating: HealthCheckRating;
+}
+
 interface Props {
-  onSubmit: (values: EntryFormValues) => void;
+  onSubmit: (values: NewEntryFormValues) => void;
   onCancel: () => void;
 }
 
 export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   const [{ diagnoses }] = useStateValue();
+  const [isHospital, setIsHospital] = React.useState<boolean>(false);
+  const [isHealthCheck, setIsHealthCheck] = React.useState<boolean>(false);
+  const [isOccupational, setIsOccupational] = React.useState<boolean>(false);
+  const initialState = {
+    description: "",
+    date: "",
+    specialist: "",
+    diagnosisCodes: [""],
+    type: "Hospital" as const,
+    sickLeave: { startDate: "", endDate: "" },
+    dischargeDate: "",
+    dischargeCriteria: "",
+    healthCheckRating: 0,
+  };
+
+  const customOnSubmit = (data: NewEntryFormValues) => {
+    data.discharge = {
+      criteria: data.dischargeCriteria || "",
+      date: data.dischargeDate || "",
+    };
+
+    return onSubmit(data);
+  };
+
+  const onTypeChanged = (setFieldValue: any, field: any, value: any) => {
+    setIsHospital(false);
+    setIsHospital(false);
+    setIsOccupational(false);
+
+    switch (value) {
+      case "Hospital":
+        setIsHospital(true);
+        break;
+      case "HealthCheck":
+        setIsHealthCheck(true);
+        break;
+      case "OccupationalHealthcare":
+        setIsOccupational(true);
+        break;
+      default:
+        setIsHospital(true);
+    }
+
+    setFieldValue(field, value);
+  };
 
   return (
     <Formik
-      initialValues={{
-        description: "",
-        date: "",
-        specialist: "",
-        diagnosisCodes: [""],
-        type: "Hospital",
-      }}
-      onSubmit={onSubmit}
+      initialValues={initialState}
+      onSubmit={customOnSubmit}
       validate={(values) => {
         const requiredError = "Field is required";
         const errors: { [field: string]: string } = {};
@@ -47,6 +97,28 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           errors.type = requiredError;
         }
 
+        if (values.type && values.type === "OccupationalHealthcare") {
+          if (!values.sickLeave) {
+            errors.sickLeave = requiredError;
+          }
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
+        }
+        if (values.type && values.type === "HealthCheck") {
+          if (!values.healthCheckRating) {
+            errors.healthCheckRating = requiredError;
+          }
+        }
+        if (values.type && values.type === "Hospital") {
+          if (!values.dischargeDate) {
+            errors.dischargeDate = requiredError;
+          }
+          if (!values.dischargeCriteria) {
+            errors.dischargeCriteria = requiredError;
+          }
+        }
+
         return errors;
       }}
     >
@@ -54,7 +126,9 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         return (
           <Form className="form ui">
             <EntryTypeSelection
-              setFieldValue={setFieldValue}
+              setFieldValue={(field, value) =>
+                onTypeChanged(setFieldValue, field, value)
+              }
               setFieldTouched={setFieldTouched}
             />
             <Field
@@ -75,6 +149,43 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               setFieldTouched={setFieldTouched}
               diagnoses={Object.values(diagnoses)}
             />
+
+            {isOccupational && (
+              <Field
+                label="Employer Name"
+                placeholder="Employer Name"
+                name="employerName"
+                component={TextField}
+              />
+            )}
+            {isOccupational && (
+              <SickLeaveSelection
+                setFieldValue={setFieldValue}
+                setFieldTouched={setFieldTouched}
+              />
+            )}
+
+            {isHospital && (
+              <Field
+                label="Discharge criteria"
+                placeholder="Discharge criteria"
+                name="dischargeCriteria"
+                component={TextField}
+              />
+            )}
+            {isHospital && (
+              <Field
+                label="Discharge Date"
+                name="dischargeDate"
+                component={DateField}
+              />
+            )}
+            {isHealthCheck && (
+              <HealthCheckRatingSelection
+                setFieldValue={setFieldValue}
+                setFieldTouched={setFieldTouched}
+              />
+            )}
             <Grid>
               <Grid.Column floated="left" width={5}>
                 <Button type="button" onClick={onCancel} color="red">

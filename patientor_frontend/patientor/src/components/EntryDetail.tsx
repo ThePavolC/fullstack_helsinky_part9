@@ -6,6 +6,8 @@ import {
   HealthCheckEntry,
   OccupationalHealthcareEntry,
   HealthCheckRating,
+  SickLeave,
+  Discharge,
 } from "../types";
 
 interface EntryDetailProps {
@@ -15,6 +17,9 @@ interface EntryDetailProps {
   icon: IconProps["name"];
   healthCheckRating?: HealthCheckRating;
   specialist: string;
+  employerName?: string;
+  sickLeave?: SickLeave;
+  discharge?: Discharge;
 }
 
 const EntryDetail: React.FC<EntryDetailProps> = ({
@@ -24,6 +29,9 @@ const EntryDetail: React.FC<EntryDetailProps> = ({
   icon,
   healthCheckRating,
   specialist,
+  employerName,
+  sickLeave,
+  discharge,
 }) => {
   const [{ diagnoses }] = useStateValue();
 
@@ -48,6 +56,20 @@ const EntryDetail: React.FC<EntryDetailProps> = ({
       <h4>
         {date} <Icon name={icon} />
       </h4>
+
+      {employerName && <h5>Employer name: {employerName}</h5>}
+      {sickLeave && (
+        <span>
+          sick leave: {sickLeave.startDate} - {sickLeave.endDate}
+        </span>
+      )}
+
+      {discharge && (
+        <>
+          <h5>Discharge</h5> <p>date: {discharge.date}</p>{" "}
+          <p>criteria: {discharge.criteria}</p>{" "}
+        </>
+      )}
 
       <div>
         <i style={{ color: "dimgrey" }}>{description}</i>
@@ -88,6 +110,7 @@ export const HospitalEntryDetail: React.FC<{ entry: HospitalEntry }> = ({
       diagnosisCodes={entry?.diagnosisCodes}
       icon="hospital"
       specialist={entry.specialist}
+      discharge={entry.discharge}
     />
   );
 };
@@ -117,6 +140,8 @@ export const OccupationalHealthcareEntryDetail: React.FC<{
       diagnosisCodes={entry.diagnosisCodes}
       icon="user md"
       specialist={entry.specialist}
+      employerName={entry.employerName}
+      sickLeave={entry.sickLeave}
     />
   );
 };
